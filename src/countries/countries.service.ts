@@ -1,5 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { LoggerService } from 'src/shared/services/logger.service';
 
 export interface RestCountry {
   name: {
@@ -14,39 +15,56 @@ export interface RestCountry {
 
 @Injectable()
 export class CountriesService {
-  private readonly logger = new Logger(CountriesService.name);
   private countriesCache: RestCountry[] | null = null;
   private readonly apiUrl = process.env.RESTCOUNTRIES_API_URL;
 
+  constructor(private readonly logger: LoggerService) {}
+
   async getAllCountries(): Promise<RestCountry[]> {
     if (this.countriesCache) {
+      this.logger.LogInfo('Returning cached countries');
       return this.countriesCache;
     }
 
     try {
-      this.logger.log('Fetching countries from REST Countries API...');
+      this.logger.LogInfo('Fetching countries from REST Countries API...');
       const response = await axios.get<RestCountry[]>(
         `${this.apiUrl}/all?fields=name,cca3,capital,region,subregion`,
       );
 
       this.countriesCache = response.data;
-      this.logger.log(`Fetched ${this.countriesCache.length} countries`);
+      this.logger.LogInfo(`Fetched ${this.countriesCache.length} countries`);
 
       return this.countriesCache;
     } catch (error) {
-      this.logger.error('Failed to fetch countries from API', error);
+      this.logger.LogError(
+        `Failed to fetch countries from API: ${error.message}`,
+        500,
+      );
       throw new Error('Failed to fetch countries');
     }
   }
 
   async getCountryByCode(code: string): Promise<RestCountry | null> {
+    this.logger.LogInfo(`Looking up country by code: ${code}`);
     const countries = await this.getAllCountries();
-    return countries.find((c) => c.cca3 === code) || null;
+    const country = countries.find((c) => c.cca3 === code) || null;
+
+    if (country) {
+      this.logger.LogInfo(`Found country: ${country.name.common} (${code})`);
+    } else {
+      this.logger.LogWarning(`Country not found for code: ${code}`);
+    }
+
+    return country;
   }
 
   async getCountriesByCodes(
     codes: string[],
   ): Promise<Map<string, RestCountry>> {
+    this.logger.LogInfo(
+      `Looking up ${codes.length} countries by codes: ${codes.join(', ')}`,
+    );
     const countries = await this.getAllCountries();
     const countryMap = new Map<string, RestCountry>();
 
@@ -55,6 +73,10 @@ export class CountriesService {
         countryMap.set(country.cca3, country);
       }
     });
+
+    this.logger.LogInfo(
+      `Found ${countryMap.size} out of ${codes.length} requested countries`,
+    );
 
     return countryMap;
   }
