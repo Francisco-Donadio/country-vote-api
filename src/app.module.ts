@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { SharedModule } from './shared/shared.module';
 import { CountriesModule } from './countries/countries.module';
 import { VotesModule } from './votes/votes.module';
 
@@ -8,6 +9,7 @@ import { VotesModule } from './votes/votes.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    SharedModule,
     CountriesModule,
     VotesModule,
   ],
