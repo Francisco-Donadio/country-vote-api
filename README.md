@@ -2,6 +2,11 @@
 
 A RESTful API built with NestJS for managing country voting. Users can submit votes for their favorite countries, view top voted countries, and search through country rankings.
 
+## 🌐 Live Application
+
+**Frontend**: [https://country-vote.onrender.com](https://country-vote.onrender.com)  
+**API Base URL**: [https://country-vote-api.onrender.com/api](https://country-vote-api.onrender.com/api)
+
 ## 🚀 Features
 
 - **Vote Submission**: One vote per email address
@@ -101,11 +106,12 @@ The API will be available at `http://localhost:3000`
 
 ## 📚 API Documentation
 
-Once the application is running, access the interactive Swagger documentation at:
+### Live API Documentation
 
-```
-http://localhost:3000/api-docs
-```
+Interactive Swagger documentation:
+
+- **Production**: [https://country-vote-api.onrender.com/api-docs](https://country-vote-api.onrender.com/api-docs)
+- **Local Development**: `http://localhost:3000/api-docs`
 
 ## 🧪 Testing
 
@@ -188,6 +194,20 @@ src/
 
 ### Submit a Vote
 
+**Production:**
+
+```bash
+curl -X POST https://country-vote-api.onrender.com/api/votes \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "country": "ARG"
+  }'
+```
+
+**Local:**
+
 ```bash
 curl -X POST http://localhost:3000/api/votes \
   -H "Content-Type: application/json" \
@@ -200,11 +220,27 @@ curl -X POST http://localhost:3000/api/votes \
 
 ### Get Top Countries
 
+**Production:**
+
+```bash
+curl https://country-vote-api.onrender.com/api/votes/top
+```
+
+**Local:**
+
 ```bash
 curl http://localhost:3000/api/votes/top
 ```
 
 ### Search Countries
+
+**Production:**
+
+```bash
+curl https://country-vote-api.onrender.com/api/votes/search?query=Europe
+```
+
+**Local:**
 
 ```bash
 curl http://localhost:3000/api/votes/search?query=Europe
